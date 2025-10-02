@@ -1,0 +1,36 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: company_php
+    depends_on:
+      - mariadb
+    ports:
+      - "6060:80"        # host:container  (Apache listens on 80)
+    volumes:
+      - .:/var/www/html
+
+  mariadb:
+    image: mariadb:10.6.20
+    container_name: company_mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: company
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: company_phpmyadmin
+    depends_on:
+      - mariadb
+    environment:
+      PMA_HOST: mariadb
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "8083:80"        # phpMyAdmin also serves on 80 in the container
+volumes:
+  mariadb_data:
